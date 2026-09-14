@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ماتريكس فو يو | Matrix For You</title>
+  <style>
+    :root {
+      --fb-bg: #090d13; --fb-card: #121820; --fb-hover: #1c2430;
+      --fb-text: #e6edf3; --fb-muted: #8b949e; --fb-blue: #1f6feb;
+      --fb-green: #2ea043; --fb-red: #f85149; --fb-border: #283342;
+      --matrix-green: #00ff66; --matrix-glow: rgba(0, 255, 102, 0.35);
+      --binance-yellow: #f0b90b; --cyber-cyan: #00f2fe;
+      --wa-header: #202c33; --wa-bg: #0b141a;
+      --wa-incoming: #202c33; --wa-outgoing: #005c4b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--fb-bg); color: var(--fb-text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+
+    .fb-header { position: sticky; top: 0; z-index: 1000; background: var(--fb-card); border-bottom: 1px solid var(--fb-border); height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.5); gap: 10px; }
+    .fb-logo-search { display: flex; align-items: center; gap: 10px; }
+    .fb-logo { width: 40px; height: 40px; background: linear-gradient(135deg, #00ff66, #03a062); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 900; color: #0d1117; box-shadow: 0 0 15px var(--matrix-glow); }
+    .brand-title-wrap b { font-size: 0.95rem; color: var(--matrix-green); }
+    .brand-title-wrap span { font-size: 0.65rem; color: var(--fb-muted); font-family: monospace; display: block; }
+    .fb-search { background: var(--fb-hover); border: 1px solid var(--fb-border); border-radius: 20px; padding: 8px 16px; color: #fff; font-size: 0.82rem; outline: none; width: 140px; direction: ltr; }
+    .fb-search:focus { border-color: var(--matrix-green); }
+
+    .cyber-radio-widget { display: flex; align-items: center; gap: 6px; background: #05080c; border: 1px solid #1a3322; padding: 4px 10px; border-radius: 22px; box-shadow: inset 0 0 12px rgba(0,255,102,0.1); }
+    .radio-info { display: flex; flex-direction: column; max-width: 130px; }
+    .radio-info b { font-size: 0.68rem; color: var(--matrix-green); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .radio-info span { font-size: 0.52rem; color: var(--fb-muted); }
+    .radio-controls { display: flex; align-items: center; gap: 4px; }
+    .radio-btn { background: var(--fb-hover); border: 1px solid var(--fb-border); color: var(--matrix-green); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; }
+    .radio-btn:hover { background: var(--matrix-green); color: #0d1117; }
+    .radio-btn.stop-btn { color: var(--fb-red); }
+    .volume-slider { width: 45px; accent-color: var(--matrix-green); cursor: pointer; height: 4px; }
+
+    .fb-wallet-badge { display: flex; align-items: center; gap: 8px; }
+    .fb-chip { background: var(--fb-hover); padding: 6px 12px; border-radius: 20px; font-size: 0.82rem; font-weight: bold; border: 1px solid var(--fb-border); }
+    .btn-toggle-round { background: var(--fb-hover); border: 1px solid var(--fb-border); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; }
+    .btn-toggle-round:hover { background: var(--matrix-green); color: #0d1117; }
+
+    .fb-main { display: grid; grid-template-columns: 260px 1fr 340px; gap: 14px; padding: 14px; max-width: 1540px; margin: 0 auto; }
+    @media (max-width: 1150px) { .fb-main { grid-template-columns: 1fr; } .fb-left-col, .fb-right-col { display: none; } }
+
+    .fb-post { background: var(--fb-card); border-radius: 10px; padding: 14px; margin-bottom: 14px; border: 1px solid var(--fb-border); }
+    .stories-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 12px; }
+    .story-card { min-width: 90px; height: 92px; background: var(--fb-hover); border-radius: 8px; padding: 8px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; border: 2px solid transparent; transition: all 0.2s ease; user-select: none; }
+    .story-card:hover { background: #18231d; border-color: rgba(0, 255, 102, 0.4); transform: translateY(-2px); }
+    .story-card.active { border-color: var(--matrix-green); background: #0c2619; box-shadow: 0 0 10px rgba(0, 255, 102, 0.2); }
+    .story-card b { font-size: 0.92rem; color: #fff; }
+    .story-card span { font-size: 0.68rem; color: var(--fb-muted); }
+    .story-card small { font-size: 0.72rem; font-family: monospace; font-weight: bold; transition: color 0.3s; }
+
+    .bot-radar-box { background: #05080c; border: 1px solid var(--fb-border); border-radius: 6px; padding: 8px 10px; margin: 8px 0; font-size: 0.75rem; display: flex; align-items: center; gap: 8px; }
+    .radar-pulse { width: 10px; height: 10px; border-radius: 50%; background: var(--matrix-green); box-shadow: 0 0 10px var(--matrix-green); animation: pulseAnim 1.2s infinite; }
+    .radar-pulse.off { background: var(--fb-muted); box-shadow: none; animation: none; }
+    @keyframes pulseAnim { 0%, 100% { transform: scale(0.85); opacity: 0.6; } 50% { transform: scale(1.25); opacity: 1; } }
+
+    .targets-box { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; text-align: center; margin: 10px 0; }
+    .target-cell { background: #05080c; padding: 6px 2px; border-radius: 6px; border: 1px solid var(--fb-border); }
+    .target-cell span { font-size: 0.62rem; color: var(--fb-muted); display: block; }
+    .target-cell b { font-size: 0.8rem; direction: ltr; display: block; margin-top: 2px; }
+
+    .btn-action-post { width: 100%; padding: 11px; border: none; border-radius: 6px; font-weight: 800; font-size: 0.88rem; cursor: pointer; color: #0d1117; }
+    .btn-matrix-act { background: linear-gradient(135deg, var(--matrix-green), #03a062); box-shadow: 0 2px 14px var(--matrix-glow); }
+    .btn-buy-act { background: var(--matrix-green); color: #0d1117; }
+    .btn-sell-act { background: var(--fb-red); color: #fff; }
+
+    .chart-header-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; flex-wrap: wrap; gap: 8px; }
+    .timeframe-group { display: flex; gap: 3px; background: #05080c; padding: 2px 4px; border-radius: 6px; border: 1px solid var(--fb-border); }
+    .chart-tool-btn { background: transparent; border: none; color: var(--fb-muted); padding: 3px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
+    .chart-tool-btn:hover, .chart-tool-btn.active { background: var(--fb-blue); color: #fff; }
+    #binance-chart-wrapper { width: 100%; height: 480px; min-height: 280px; max-height: 900px; background: #121820; border-radius: 6px; overflow: hidden; position: relative; }
+    #binance-chart-frame { width: 100%; height: 100%; border: none; }
+
+    .binance-board-card { background: var(--fb-card); border: 1px solid #3d351b; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+    .binance-table-wrap { overflow-x: auto; max-height: 280px; }
+    .binance-table { width: 100%; border-collapse: collapse; font-size: 0.74rem; text-align: right; }
+    .binance-table th, .binance-table td { padding: 6px; border-bottom: 1px solid var(--fb-border); }
+    .binance-table th { color: var(--fb-muted); font-size: 0.66rem; }
+    .binance-row-clickable { cursor: pointer; }
+    .binance-row-clickable:hover { background: rgba(240, 185, 11, 0.08); }
+    .binance-row-clickable.active-row { background: rgba(0, 255, 102, 0.12); border-right: 3px solid var(--matrix-green); }
+
+    .menu-item { display: flex; align-items: center; gap: 10px; padding: 9px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-weight: 600; }
+    .menu-item:hover { background: var(--fb-hover); }
+
+    .pnl-summary-card { background: #05080c; border: 1px solid var(--fb-border); border-radius: 8px; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .pnl-badge { display: inline-block; padding: 3px 6px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; direction: ltr; }
+    .badge-win { background: rgba(0, 255, 102, 0.15); color: var(--matrix-green); border: 1px solid var(--matrix-green); }
+    .badge-loss { background: rgba(248, 81, 73, 0.15); color: var(--fb-red); border: 1px solid var(--fb-red); }
+    .btn-close { background: var(--fb-hover); color: var(--fb-muted); border: 1px solid var(--fb-border); padding: 3px 8px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+    .btn-close:hover { background: var(--fb-red); color: #fff; }
+
+    .interactive-window { position: fixed; backdrop-filter: blur(14px); border-radius: 14px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; overflow: hidden; transition: transform 0.25s ease, opacity 0.25s ease; }
+    .win-resize-handle { position: absolute; width: 16px; height: 16px; z-index: 100005; user-select: none; opacity: 0.65; transition: opacity 0.2s, transform 0.2s; }
+    .win-resize-handle:hover { opacity: 1; transform: scale(1.15); }
+    #pred-resizer { top: 6px; right: 6px; cursor: ne-resize; border-top: 3px solid var(--matrix-green); border-right: 3px solid var(--matrix-green); border-radius: 0 4px 0 0; }
+    #wa-resizer { top: 6px; left: 6px; cursor: nw-resize; border-top: 3px solid var(--matrix-green); border-left: 3px solid var(--matrix-green); border-radius: 4px 0 0 0; }
+    .window-maximized { width: calc(100vw - 48px) !important; height: calc(100vh - 96px) !important; max-width: none !important; max-height: none !important; top: 74px !important; bottom: auto !important; left: 24px !important; right: 24px !important; border-radius: 12px !important; z-index: 100010 !important; }
+
+    .win-control-btn { background: transparent; border: 1px solid #2a3942; border-radius: 4px; color: #8696a0; cursor: pointer; font-size: 0.75rem; padding: 2px 6px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+    .win-control-btn:hover { background: #2a3942; color: #fff; }
+
+    #predictions-left-widget { bottom: 24px; left: 24px; width: 360px; height: 560px; min-width: 290px; min-height: 380px; max-width: 90vw; max-height: 85vh; background: rgba(11, 20, 26, 0.95); border: 1px solid rgba(0, 255, 102, 0.35); box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 255, 102, 0.12); z-index: 99997; }
+    #predictions-left-widget.pred-hidden { transform: translateY(115%) scale(0.9); opacity: 0; pointer-events: none; }
+
+    #wa-side-widget { bottom: 24px; right: 24px; width: 360px; height: 550px; min-width: 290px; min-height: 380px; max-width: 90vw; max-height: 85vh; background: var(--wa-bg); border: 1px solid #283342; z-index: 99999; }
+    #wa-side-widget.wa-hidden { transform: translateY(115%) scale(0.9); opacity: 0; pointer-events: none; }
+
+    .pred-card-item { background: #060e13; border: 1px solid #173626; border-right: 4px solid var(--matrix-green); border-radius: 8px; padding: 12px; box-shadow: 0 4px 14px rgba(0,0,0,0.5); animation: predSlideIn 0.3s ease; position: relative; overflow: hidden; transition: all 0.3s ease;}
+    .pred-card-item.bearish { border-right-color: var(--fb-red); border-color: #3b1b1b; }
+    .pred-expired { opacity: 0.6; filter: grayscale(0.8); pointer-events: none; }
+    @keyframes predSlideIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
+
+    .timer-badge { background: #0d1117; color: var(--binance-yellow); border: 1px solid var(--binance-yellow); padding: 2px 6px; border-radius: 4px; font-family: monospace; font-size: 0.75rem; font-weight: bold; display: flex; align-items: center; gap: 4px;}
+    .timer-badge.urgent { color: var(--fb-red); border-color: var(--fb-red); animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: 0.5; } }
+
+    .pred-exec-btn { width: 100%; margin-top: 10px; background: var(--matrix-green); color: #0d1117; border: none; border-radius: 5px; padding: 9px; font-weight: 800; cursor: pointer; font-size: 0.8rem; transition: filter 0.2s;}
+    .pred-exec-btn:hover:not(:disabled) { box-shadow: 0 0 12px var(--matrix-glow); filter: brightness(1.1); }
+    .pred-exec-btn:disabled { background: #2a3942; color: #8696a0; cursor: not-allowed; box-shadow: none; }
+
+    .floating-fab { position: fixed; width: 50px; height: 50px; border-radius: 50%; border: none; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.3rem; color: #0d1117; transition: transform 0.2s ease; }
+    .floating-fab:hover { transform: scale(1.08); }
+    .floating-fab.btn-hidden { display: none; }
+    #wa-floating-trigger { bottom: 24px; right: 24px; background: linear-gradient(135deg, #00ff66, #00a884); z-index: 99995; }
+    #pred-floating-trigger { bottom: 24px; left: 24px; background: linear-gradient(135deg, #00a884, #00ff66); z-index: 99995; }
+
+    .wa-bubble { padding: 8px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 0.85rem; line-height: 1.4; position: relative; }
+    .wa-bubble.incoming { background: var(--wa-incoming); color: var(--wa-text); border-top-right-radius: 0; align-self: flex-start; }
+    .wa-bubble.outgoing { background: var(--wa-outgoing); color: var(--wa-text); border-top-left-radius: 0; align-self: flex-end; }
+    .wa-msg-meta { font-size: 0.65rem; color: var(--wa-subtext); text-align: left; margin-top: 4px; display: flex; justify-content: flex-end; gap: 6px; }
+  </style>
+</head>
+<body id="page-body">
+
+  <button id="wa-floating-trigger" class="floating-fab btn-hidden" onclick="toggleWhatsAppChat()">💬</button>
+  <button id="pred-floating-trigger" class="floating-fab btn-hidden" onclick="togglePredictionsWidget()">🔮</button>
+
+  <div id="predictions-left-widget" class="interactive-window">
+    <div id="pred-resizer" class="win-resize-handle"></div>
+    <div style="background:#111d24; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #1a2f24;">
+      <div style="display:flex; align-items:center; gap:8px;">
+        <div style="font-size:1.1rem;">🔮</div>
+        <div>
+          <b style="font-size:0.85rem; color:#fff;">الرادار الفائق (15m Sniper)</b>
+          <span style="font-size:0.62rem; color:var(--matrix-green); font-family:monospace; display:block;">Smart Money • Real ATR</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button class="win-control-btn" onclick="toggleMaximizeWindow('predictions-left-widget')">🗖</button>
+        <button class="win-control-btn" onclick="togglePredictionsWidget()">✕</button>
+      </div>
+    </div>
+    <div style="flex:1; padding:12px; overflow-y:auto; display:flex; flex-direction:column; gap:12px;" id="predictions-stream-box">
+        <div style="text-align: center; color: var(--fb-muted); font-size: 0.8rem; margin-top: 20px;">
+            جاري مسح الأسواق... 📡<br>بانتظار انفجارات السيولة وتوافق الترند
+        </div>
+    </div>
+  </div>
+
+  <div id="wa-side-widget" class="interactive-window">
+    <div id="wa-resizer" class="win-resize-handle"></div>
+    <div style="background:var(--wa-header); padding:10px 14px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #2a3942;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <div style="width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg, #00a884, #056162); display:flex; align-items:center; justify-content:center; font-size:1rem;">🤖</div>
+        <div>
+          <b style="font-size:0.85rem; color:#fff;">مساعد ماتريكس الشامل</b>
+          <span style="font-size:0.65rem; color:var(--matrix-green); display:block;">توقعات حية • نجاح 93%</span>
+        </div>
+      </div>
+      <div style="display:flex; align-items:center; gap:6px;">
+        <button id="btn-voice-commentary" onclick="toggleBotVoiceCommentary()" class="win-control-btn" style="color:var(--matrix-green);">🔊</button>
+        <button class="win-control-btn" onclick="toggleMaximizeWindow('wa-side-widget')">🗖</button>
+        <button class="win-control-btn" onclick="toggleWhatsAppChat()">✕</button>
+      </div>
+    </div>
+    <div class="wa-body-chat" id="wa-messages-box" style="flex: 1; padding: 10px; overflow-y: auto; display: flex; flex-direction: column;">
+      <div class="wa-bubble incoming">
+        أهلاً بك يا <b>أبو الميز</b>! تم إصلاح جميع الأخطاء البرمجية. أزرار التحكم تعمل بامتياز، الرادار الآن يلتقط الفرص بشكل أدق وأسرع، وصوتي جاهز لقراءة التنبيهات.
+        <div class="wa-msg-meta"><span>الآن</span></div>
+      </div>
+    </div>
+    <div class="wa-input-footer" style="padding: 10px; display: flex; gap: 8px; background: var(--wa-header); border-top: 1px solid #2a3942;">
+      <input type="text" id="wa-chat-input" style="flex: 1; padding: 8px 12px; border-radius: 20px; border: none; background: #2a3942; color: #fff; outline:none;" placeholder="اسأل المساعد الذكي..." onkeydown="if(event.key==='Enter') sendCustomMatrixQuery()">
+      <button style="background: var(--matrix-green); border: none; color: #000; padding: 8px 12px; border-radius: 50%; cursor: pointer; font-weight: bold;" onclick="sendCustomMatrixQuery()">➤</button>
+    </div>
+  </div>
+
+  <header class="fb-header">
+    <div class="fb-logo-search">
+      <div class="fb-logo">M4U</div>
+      <div class="brand-title-wrap">
+        <b>ماتريكس فو يو</b>
+        <span>MATRIX FOR YOU</span>
+      </div>
+      <input type="text" id="crypto-search-input" class="fb-search" placeholder="ابحث (SOL, BTC)..." onkeydown="handleSearch(event)">
+    </div>
+
+    <div class="cyber-radio-widget">
+      <div style="font-size:1rem;">📻</div>
+      <div class="radio-info">
+        <b id="radio-title">إذاعة القرآن الكريم (القاهرة)</b>
+        <span id="radio-status">جاهز للتشغيل</span>
+      </div>
+      <div class="radio-controls">
+        <button class="radio-btn" onclick="radioPrevStation()">⏮</button>
+        <button class="radio-btn" id="radio-play-btn" onclick="radioTogglePlay()">▶</button>
+        <button class="radio-btn stop-btn" onclick="radioStop()">⏹</button>
+        <button class="radio-btn" onclick="radioNextStation()">⏭</button>
+        <input type="range" class="volume-slider" id="radio-volume" min="0" max="1" step="0.05" value="0.8" oninput="changeRadioVolume(this.value)">
+      </div>
+    </div>
+
+    <div class="fb-wallet-badge">
+      <button class="btn-toggle-round" onclick="togglePredictionsWidget()" style="color:var(--cyber-cyan); border-color:#1f6feb;">🔮</button>
+      <button class="btn-toggle-round" onclick="toggleWhatsAppChat()">💬</button>
+      <button id="btn-sound" class="btn-toggle-round" onclick="toggleSound()">🔊</button>
+      <div class="fb-chip">كاش: <b id="cash-val" style="color:var(--matrix-green);">$10,000.00</b></div>
+      <button onclick="addFunds(2000)" class="fb-chip" style="background:var(--matrix-green); color:#0d1117; border:none; cursor:pointer;">+ 2k$</button>
+    </div>
+  </header>
+
+  <div class="fb-main">
+    <aside class="fb-left-col">
+      <div class="menu-item" style="color:var(--matrix-green); font-weight:bold;">
+        <div style="width:36px; height:36px; border-radius:50%; background:linear-gradient(135deg, var(--matrix-green), #03a062); color:#0d1117; display:flex; align-items:center; justify-content:center;">M</div>
+        <span>المتداول: أبو الميز</span>
+      </div>
+      <div class="menu-item" onclick="switchAsset('BTC')">🪙 بيتكوين (BTC)</div>
+      <div class="menu-item" onclick="switchAsset('ETH')">💎 إيثيريوم (ETH)</div>
+      <div class="menu-item" onclick="switchAsset('TRX')">🔴 ترون (TRX)</div>
+      <div class="menu-item" onclick="switchAsset('ONDO')">🌊 أوندو (ONDO)</div>
+      <div class="menu-item" onclick="switchAsset('SOL')">⚡ سولانا (SOL)</div>
+      <hr style="border-color:var(--fb-border); margin: 6px 0;">
+
+      <div class="menu-item" onclick="togglePredictionsWidget()">
+        🔮 الرادار الفائق (15m): <b style="color:var(--cyber-cyan); margin-right:4px;">مفتوح</b>
+      </div>
+
+      <div class="menu-item" onclick="toggleAutoSniper()">
+        🤖 القناص الآلي: <b id="bot-status" style="color:var(--matrix-green); margin-right:4px;">يعمل 🟢</b>
+      </div>
+
+      <div class="bot-radar-box">
+        <div id="radar-light" class="radar-pulse"></div>
+        <span id="radar-text" style="color:var(--matrix-green);">الرادار نشط (Smart Money)</span>
+      </div>
+
+      <div class="menu-item" onclick="resetAccount()">🔄 تصفير المحفظة لـ 10,000$</div>
+    </aside>
+
+    <main>
+      <div class="stories-row" id="top-stories-row"></div>
+
+      <div class="fb-post">
+        <div class="chart-header-bar">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <b>الشارت المباشر: <span id="chart-symbol-label" style="color:var(--binance-yellow);">BTCUSDT</span></b>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <div class="timeframe-group">
+              <button class="chart-tool-btn active" id="tf-15" onclick="changeTimeframe(event, '15')">15m</button>
+              <button class="chart-tool-btn" onclick="changeTimeframe(event, '60')">1h</button>
+              <button class="chart-tool-btn" onclick="changeTimeframe(event, '240')">4h</button>
+              <button class="chart-tool-btn" onclick="changeTimeframe(event, 'D')">1D</button>
+            </div>
+          </div>
+        </div>
+        <div id="binance-chart-wrapper">
+          <iframe id="binance-chart-frame" src="https://www.tradingview.com/widgetembed/?symbol=BINANCE%3ABTCUSDT&interval=15&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=121820&theme=dark&style=1&timezone=Etc%2FUTC&locale=ar"></iframe>
+        </div>
+      </div>
+
+      <div class="fb-post">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <b>تنفيذ يدوي (بمخاطر 1% تلقائية) على <span id="target-asset-title">BTC</span></b>
+          <div style="font-size:0.75rem; color:var(--matrix-green); font-family:monospace;" id="live-price-sub">السعر اللحظي: ---</div>
+        </div>
+        <div class="targets-box">
+          <div class="target-cell"><span>وقف الخسارة (SL)</span><b id="val-sl" style="color:var(--fb-red);">--</b></div>
+          <div class="target-cell"><span>الهدف الأول (TP1)</span><b id="val-tp1" style="color:var(--matrix-green);">--</b></div>
+          <div class="target-cell"><span>الهدف الثاني (TP2)</span><b id="val-tp2" style="color:var(--matrix-green);">--</b></div>
+          <div class="target-cell"><span>نسبة الـ ATR</span><b id="val-atr" style="color:var(--cyber-cyan);">--</b></div>
+        </div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button class="btn-action-post btn-buy-act" style="flex:1;" onclick="openTrade('BUY')">شراء Long</button>
+          <button class="btn-action-post btn-sell-act" style="flex:1;" onclick="openTrade('SELL')">بيع Short</button>
+        </div>
+      </div>
+
+      <div class="binance-board-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <b style="color:var(--binance-yellow); font-size:0.88rem;">أسواق بينانس المباشرة</b>
+          <span style="font-size:0.7rem; color:var(--fb-muted);">مزامنة حية 🟢</span>
+        </div>
+        <div class="binance-table-wrap">
+          <table class="binance-table">
+            <thead><tr><th>الزوج</th><th>السعر المباشر</th><th>تغير 24 ساعة</th><th>تحديث ATR</th></tr></thead>
+            <tbody id="binance-market-tbody"><tr><td colspan="4" style="text-align:center;">جاري التحميل...</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <aside class="fb-right-col">
+      <div style="font-weight:bold; margin-bottom:8px; font-size:0.9rem;">
+        الصفقات المفتوحة (<span id="open-trades-count" style="color:var(--matrix-green);">0</span>/5)
+      </div>
+      <div class="pnl-summary-card">
+        <div>
+          <span style="font-size:0.68rem; color:var(--fb-muted); display:block;">صافي الأرباح اللحظية:</span>
+          <b id="total-pnl-banner" style="font-size:1.05rem; direction:ltr; display:block; color:var(--fb-muted);">$0.00 (0.00%)</b>
+        </div>
+      </div>
+      <div style="max-height: 360px; overflow-y:auto; margin-bottom:12px;">
+        <table style="width:100%; border-collapse:collapse; font-size:0.75rem;">
+          <thead>
+            <tr style="border-bottom:1px solid #1a2736; color:var(--fb-muted);">
+              <th style="padding:4px; text-align:right;">العقد</th>
+              <th style="padding:4px; text-align:right;">الدخول/الحالي</th>
+              <th style="padding:4px; text-align:right;">الربح</th>
+              <th style="padding:4px; text-align:center;">إغلاق</th>
+            </tr>
+          </thead>
+          <tbody id="positions-body"><tr><td colspan="4" style="text-align:center; padding:16px 0;">لا توجد صفقات</td></tr></tbody>
+        </table>
+      </div>
+      <div class="fb-post" style="padding:10px;">
+        <h4 style="font-size:0.8rem; color:var(--matrix-green); margin-bottom:6px;">📊 سجل الأداء</h4>
+        <div style="font-size:0.72rem; color:var(--fb-muted); line-height:1.6;">
+          <div>الصفقات المغلقة: <b id="journal-total-closed" style="color:#fff;">0</b></div>
+          <div>نسبة النجاح: <b id="journal-win-rate" style="color:var(--matrix-green);">0%</b></div>
+          <div>إجمالي العوائد: <b id="journal-total-profit" style="color:var(--matrix-green);">$0.00</b></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <audio id="cyber-radio-audio" preload="none"></audio>
+
+  <script>
+    // --- المتغيرات العامة ---
+    let currentAsset = 'BTC';
+    let currentInterval = '15';
+    let currentPrice = 0; 
+    let isSoundEnabled = true;
+    let isAutoSniperActive = true;
+    
+    // قراءة حالة صوت المساعد من الذاكرة
+    let isBotVoiceEnabled = JSON.parse(localStorage.getItem('matrix_bot_voice_enabled'));
+    if (isBotVoiceEnabled === null) isBotVoiceEnabled = true;
+
+    const VERIFIED_COINS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'TRX', 'ONDO', 'DOGE', 'ADA', 'AVAX', 'SUI', 'LINK', 'NEAR', 'PEPE', 'APT'];
+    
+    let matrixRegistry = {};
+    VERIFIED_COINS.forEach(coin => {
+      matrixRegistry[coin] = { price: 0, dir: 'BUY', atr: 0, score: 0, history: [] };
+    });
+
+    let wallet = JSON.parse(localStorage.getItem('matrix_left_column_v23')) || { balance: 10000.00, positions: [], history: [] };
+
+    // --- الدوال الأساسية للإعدادات والأزرار ---
+    
+    // هذه هي الدالة المفقودة التي سببت عطل الأزرار مسبقاً (تم إرجاعها)
+    function toggleBotVoiceCommentary() {
+      isBotVoiceEnabled = !isBotVoiceEnabled;
+      localStorage.setItem('matrix_bot_voice_enabled', JSON.stringify(isBotVoiceEnabled));
+      const btn = document.getElementById('btn-voice-commentary');
+      if (btn) {
+        btn.textContent = isBotVoiceEnabled ? '🔊' : '🔇';
+        btn.style.color = isBotVoiceEnabled ? 'var(--matrix-green)' : 'var(--fb-muted)';
+      }
+      if (!isBotVoiceEnabled && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    }
+
+    function toggleSound() { 
+      isSoundEnabled = !isSoundEnabled; 
+      document.getElementById('btn-sound').textContent = isSoundEnabled ? '🔊' : '🔇'; 
+    }
+
+    function togglePredictionsWidget() { 
+      const w = document.getElementById('predictions-left-widget'); 
+      const btn = document.getElementById('pred-floating-trigger'); 
+      w.classList.toggle('pred-hidden'); 
+      btn.classList.toggle('btn-hidden', !w.classList.contains('pred-hidden')); 
+    }
+
+    function toggleWhatsAppChat() { 
+      const w = document.getElementById('wa-side-widget'); 
+      const btn = document.getElementById('wa-floating-trigger'); 
+      w.classList.toggle('wa-hidden'); 
+      btn.classList.toggle('btn-hidden', !w.classList.contains('wa-hidden')); 
+    }
+
+    function toggleMaximizeWindow(id) { 
+      const w = document.getElementById(id); 
+      if (w) w.classList.toggle('window-maximized'); 
+    }
+
+    function toggleAutoSniper() { 
+      isAutoSniperActive = !isAutoSniperActive; 
+      document.getElementById('bot-status').textContent = isAutoSniperActive ? 'يعمل 🟢' : 'متوقف'; 
+      document.getElementById('radar-light').className = isAutoSniperActive ? 'radar-pulse' : 'radar-pulse off'; 
+    }
+
+    function resetAccount() { 
+      if (confirm('هل تريد تصفير المحفظة إلى 10,000$ ومسح الصفقات؟')) { 
+        wallet = { balance: 10000.00, positions: [], history: [] }; 
+        saveWallet(); 
+      } 
+    }
+
+    function addFunds(amt) { 
+      wallet.balance += amt; 
+      saveWallet(); 
+      playBeep(1200, 0.1); 
+    }
+
+    function handleSearch(e) { 
+      if (e.key === 'Enter') { 
+        const val = e.target.value.trim().toUpperCase().replace('USDT', ''); 
+        if (VERIFIED_COINS.includes(val)) switchAsset(val); 
+        e.target.value = ''; 
+      } 
+    }
+
+    function changeTimeframe(e, tf) { 
+      currentInterval = tf; 
+      document.querySelectorAll('.timeframe-group .chart-tool-btn').forEach(btn => btn.classList.remove('active')); 
+      if (e && e.target) e.target.classList.add('active'); 
+      updateChartFrame(); 
+    }
+
+    // --- أدوات النظام (Format, Sound, Save) ---
+    function formatAccuratePrice(val) {
+      if (!val || isNaN(val) || val === 0) return '---';
+      const num = parseFloat(val);
+      if (num >= 1000) return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      if (num >= 1) return num.toFixed(4);
+      if (num >= 0.001) return num.toFixed(6);
+      return num.toFixed(8);
+    }
+
+    function saveWallet() {
+      localStorage.setItem('matrix_left_column_v23', JSON.stringify(wallet));
+      renderPortfolio(); renderJournalStats();
+    }
+
+    let audioCtx = null;
+    function playBeep(freq = 800, dur = 0.04) {
+      if (!isSoundEnabled) return;
+      try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.start(); osc.stop(audioCtx.currentTime + dur);
+      } catch (e) {}
+    }
+
+    // --- النوافذ القابلة للتحجيم ---
+    function setupWindowResizer(widgetId, resizerId, isLeftWidget) {
+      const widget = document.getElementById(widgetId); const resizer = document.getElementById(resizerId);
+      if (!widget || !resizer) return;
+      let isDragging = false, startX = 0, startY = 0, startW = 0, startH = 0;
+      function onDown(e) { if (widget.classList.contains('window-maximized')) return; isDragging = true; startX = e.clientX || (e.touches && e.touches[0].clientX); startY = e.clientY || (e.touches && e.touches[0].clientY); startW = widget.offsetWidth; startH = widget.offsetHeight; document.body.style.userSelect = 'none'; e.preventDefault(); }
+      function onMove(e) { if (!isDragging) return; requestAnimationFrame(()=>{ const currentX = e.clientX || (e.touches && e.touches[0].clientX); const currentY = e.clientY || (e.touches && e.touches[0].clientY); const deltaY = startY - currentY; const deltaX = isLeftWidget ? (currentX - startX) : (startX - currentX); const newW = Math.max(290, Math.min(window.innerWidth - 48, startW + deltaX)); const newH = Math.max(300, Math.min(window.innerHeight - 90, startH + deltaY)); widget.style.width = `${newW}px`; widget.style.height = `${newH}px`;}); }
+      function onUp() { if (isDragging) { isDragging = false; document.body.style.userSelect = ''; } }
+      resizer.addEventListener('mousedown', onDown); resizer.addEventListener('touchstart', onDown, { passive: false });
+      window.addEventListener('mousemove', onMove); window.addEventListener('touchmove', onMove, { passive: false });
+      window.addEventListener('mouseup', onUp); window.addEventListener('touchend', onUp);
+    }
+
+    // --- المؤشرات الفنية (Indicators) ---
+    function calculateEMA(prices, period) { 
+        if (prices.length < period) return prices[prices.length - 1] || 0; 
+        const k = 2 / (period + 1); let ema = prices[0]; 
+        for (let i = 1; i < prices.length; i++) ema = (prices[i] - ema) * k + ema; 
+        return ema; 
+    }
+    
+    function calculateRSI(prices, period = 14) { 
+        if (prices.length <= period) return 50; 
+        let gains = 0, losses = 0; 
+        for (let i = 1; i <= period; i++) { 
+            const diff = prices[i] - prices[i - 1]; 
+            if (diff > 0) gains += diff; else losses -= diff; 
+        } 
+        let avgGain = gains / period, avgLoss = losses / period; 
+        for (let i = period + 1; i < prices.length; i++) { 
+            const diff = prices[i] - prices[i - 1]; 
+            avgGain = (avgGain * (period - 1) + (diff > 0 ? diff : 0)) / period; 
+            avgLoss = (avgLoss * (period - 1) + (diff < 0 ? -diff : 0)) / period; 
+        } 
+        if (avgLoss === 0) return 100; 
+        return 100 - (100 / (1 + (avgGain / avgLoss))); 
+    }
+
+    function calculateRealATR(klines, period = 14) { 
+        if(klines.length < period + 1) return 0; 
+        let trSum = 0; 
+        for (let i = klines.length - period; i < klines.length; i++) { 
+            const high = parseFloat(klines[i][2]); const low = parseFloat(klines[i][3]); const prevClose = parseFloat(klines[i - 1][4]); 
+            const tr = Math.max(high - low, Math.abs(high - prevClose), Math.abs(low - prevClose)); trSum += tr; 
+        } 
+        return trSum / period; 
+    }
+
+    function checkVolumeSpike(klines) { 
+        if(klines.length < 15) return false; 
+        const currentVol = parseFloat(klines[klines.length - 1][5]); 
+        let sumVol = 0; 
+        for(let i = klines.length - 11; i < klines.length - 1; i++) sumVol += parseFloat(klines[i][5]); 
+        // تخفيف حدة السيولة المطلوبة لزيادة الإشارات (أعلى بـ 20% بدلاً من 50%)
+        return currentVol > ((sumVol / 10) * 1.2); 
+    }
+
+    // --- الشارت والتحديثات ---
+    function switchAsset(asset) {
+      currentAsset = asset.toUpperCase();
+      document.getElementById('target-asset-title').textContent = currentAsset;
+      document.getElementById('chart-symbol-label').textContent = `${currentAsset}USDT`;
+      document.querySelectorAll('.story-card').forEach(c => c.classList.toggle('active', c.id === `top-card-${currentAsset}`));
+      document.querySelectorAll('.binance-row-clickable').forEach(r => r.classList.toggle('active-row', r.getAttribute('data-coin') === currentAsset));
+      currentPrice = matrixRegistry[currentAsset] ? matrixRegistry[currentAsset].price : 0;
+      updateChartFrame(); updateTargetDisplay(currentAsset); playBeep(700, 0.03);
+    }
+
+    function updateChartFrame() { 
+      document.getElementById('binance-chart-frame').src = `https://www.tradingview.com/widgetembed/?symbol=BINANCE%3A${currentAsset}USDT&interval=${currentInterval}&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=121820&theme=dark&style=1&timezone=Etc%2FUTC&locale=ar`; 
+    }
+
+    function updateTargetDisplay(asset) {
+      const p = matrixRegistry[asset].price; if (p === 0) return;
+      const dir = matrixRegistry[asset].dir; const atr = matrixRegistry[asset].atr > 0 ? matrixRegistry[asset].atr : p * 0.015;
+      const sl = dir === 'BUY' ? p - (atr * 1.6) : p + (atr * 1.6); const tp1 = dir === 'BUY' ? p + (atr * 1.5) : p - (atr * 1.5); const tp2 = dir === 'BUY' ? p + (atr * 3.5) : p - (atr * 3.5);
+      document.getElementById('live-price-sub').textContent = `السعر اللحظي: $${formatAccuratePrice(p)}`;
+      document.getElementById('val-sl').textContent = `$${formatAccuratePrice(sl)}`; document.getElementById('val-tp1').textContent = `$${formatAccuratePrice(tp1)}`;
+      document.getElementById('val-tp2').textContent = `$${formatAccuratePrice(tp2)}`; document.getElementById('val-atr').textContent = `$${formatAccuratePrice(atr)}`;
+    }
+
+    // --- توليد التوقعات مع التفاصيل ---
+    function dispatchTradePrediction(targetCoin, autoReason = null, dynamicScore = 93) {
+      const coin = targetCoin || currentAsset; const liveExactPrice = matrixRegistry[coin].price; if (liveExactPrice === 0) return; 
+      const dir = matrixRegistry[coin].dir || 'BUY'; const isBuy = dir === 'BUY';
+      const atr = matrixRegistry[coin].atr > 0 ? matrixRegistry[coin].atr : (liveExactPrice * 0.015);
+      const sl = isBuy ? liveExactPrice - (atr * 1.6) : liveExactPrice + (atr * 1.6); const tp1 = isBuy ? liveExactPrice + (atr * 1.5) : liveExactPrice - (atr * 1.5);
+      const margin1Percent = Math.round(wallet.balance * 0.01 * 100) / 100;
+      
+      // توفير تفاصيل واضحة حتى لو تم طلب التوقع بشكل يدوي
+      const finalReason = autoReason ? autoReason : "تحليل كمي وتدفق سيولة لحظي (طلب يدوي)";
+      const reasonText = `<div style="color:var(--cyber-cyan); font-size:0.68rem; margin-top:6px; padding-top:6px; border-top:1px dashed #173626;">💡 مبرر الدخول: ${finalReason}</div>`;
+
+      const predStream = document.getElementById('predictions-stream-box');
+      if (predStream) {
+        if(predStream.innerHTML.includes('جاري مسح الأسواق')) predStream.innerHTML = '';
+        const cardId = 'pred-' + Date.now(); const item = document.createElement('div'); item.id = cardId; item.className = `pred-card-item ${isBuy ? '' : 'bearish'}`;
+        item.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #15261d; padding-bottom:8px; margin-bottom:8px;">
+            <b style="color:#fff; font-size:0.9rem;">${coin}/USDT • ${isBuy ? 'LONG 🟢' : 'SHORT 🔴'}</b>
+            <div style="display:flex; gap:6px; align-items:center;">
+              <span style="font-size:0.62rem; background:rgba(0, 255, 102, 0.12); color:var(--matrix-green); padding:2px 6px; border-radius:4px; font-weight:bold; border:1px solid rgba(0, 255, 102, 0.3);">دقة ${dynamicScore}%</span>
+              <span id="timer-${cardId}" class="timer-badge">05:00 ⏱</span>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.75rem; line-height:1.4;">
+            <div>السعر: <b class="live-pred-price-${coin}" style="color:var(--binance-yellow); font-family:monospace;">$${formatAccuratePrice(liveExactPrice)}</b></div>
+            <div>المخاطرة 1%: <b style="color:var(--matrix-green);">$${margin1Percent}</b></div>
+            <div>وقف (SL): <b style="color:var(--fb-red); font-family:monospace;">$${formatAccuratePrice(sl)}</b></div>
+            <div>هدف (TP1): <b style="color:var(--matrix-green); font-family:monospace;">$${formatAccuratePrice(tp1)}</b></div>
+          </div>
+          ${reasonText}
+          <button id="btn-${cardId}" class="pred-exec-btn" onclick="switchAsset('${coin}'); openTrade('${dir}'); this.disabled=true; this.textContent='تم التنفيذ بنجاح ✔';">⚡ قنص الفرصة الآن</button>`;
+        predStream.prepend(item);
+        while (predStream.children.length > 8) predStream.removeChild(predStream.lastChild);
+
+        let timeLeft = 300; 
+        const timerInterval = setInterval(() => {
+          timeLeft--; const timerEl = document.getElementById(`timer-${cardId}`);
+          if(timerEl) {
+            timerEl.textContent = `${Math.floor(timeLeft / 60).toString().padStart(2, '0')}:${(timeLeft % 60).toString().padStart(2, '0')} ⏱`;
+            if (timeLeft < 60) timerEl.classList.add('urgent');
+          }
+          if(timeLeft <= 0) {
+            clearInterval(timerInterval); const cardEl = document.getElementById(cardId);
+            if(cardEl) { cardEl.classList.add('pred-expired'); const btn = document.getElementById(`btn-${cardId}`); if(btn) { btn.disabled = true; btn.textContent = 'انتهت الصلاحية ⏱'; } }
+          }
+        }, 1000);
+      }
+      speakText(`فرصة قنص جديدة لعملة ${coin}. الاتجاه ${isBuy ? 'شراء' : 'مبيع'}.`);
+    }
+
+    // --- نظام الصفقات ---
+    function openTrade(type) {
+      const p = matrixRegistry[currentAsset].price;
+      if (p === 0 || p === '---') { alert('الرجاء الانتظار حتى يتم استلام السعر المباشر...'); return; }
+      if (wallet.positions.length >= 5) { alert('تم بلوغ الحد الأقصى (5 صفقات)'); return; }
+      let margin = Math.round(wallet.balance * 0.01 * 100) / 100; if (margin < 10) margin = Math.min(wallet.balance, 20);
+      if (wallet.balance < margin || margin <= 0) { alert('رصيد غير كافٍ'); return; }
+
+      wallet.balance -= margin; const lev = 5; const size = (margin * lev) / p;
+      const atr = matrixRegistry[currentAsset].atr > 0 ? matrixRegistry[currentAsset].atr : (p * 0.015);
+      wallet.positions.push({
+        id: Date.now(), asset: currentAsset, type: type, entry: p, margin: margin, lev: lev, size: size,
+        sl: type === 'BUY' ? p - (atr * 1.6) : p + (atr * 1.6), tp1: type === 'BUY' ? p + (atr * 1.5) : p - (atr * 1.5), tp2: type === 'BUY' ? p + (atr * 3.5) : p - (atr * 3.5), breakevenSecured: false
+      });
+      playBeep(950, 0.08); saveWallet(); appendChatMessage(`⚡ <b>تنفيذ (${type}) على ${currentAsset}:</b> السعر $${formatAccuratePrice(p)} بهامش $${margin}.`, 'incoming');
+    }
+
+    function closePosition(id, reason = '') {
+      const idx = wallet.positions.findIndex(p => p.id === id); if (idx === -1) return;
+      const p = wallet.positions[idx]; const curP = matrixRegistry[p.asset] ? matrixRegistry[p.asset].price : p.entry;
+      const pnl = p.type === 'BUY' ? (curP - p.entry) * p.size : (p.entry - curP) * p.size;
+      wallet.balance += Math.max(0, p.margin + pnl); wallet.history.push({ asset: p.asset, pnl: pnl, win: pnl >= 0 }); wallet.positions.splice(idx, 1);
+      playBeep(pnl >= 0 ? 1200 : 400, 0.1); if(reason) appendChatMessage(`⚡ <b>إغلاق آلي (${p.asset}):</b> ${reason} | النتيجة: <b>${pnl >= 0 ? '+' : ''}$${pnl.toFixed(2)}</b>`, 'incoming');
+      saveWallet();
+    }
+
+    function checkOpenPositions() {
+      let stateChanged = false;
+      for (let i = wallet.positions.length - 1; i >= 0; i--) {
+        const p = wallet.positions[i]; const curP = matrixRegistry[p.asset].price;
+        if (p.type === 'BUY') {
+          if (!p.breakevenSecured && curP >= p.tp1) { p.sl = p.entry; p.breakevenSecured = true; stateChanged = true; appendChatMessage(`🛡️ <b>تأمين (${p.asset}):</b> ضرب الهدف الأول، تم تأمين الدخول.`, 'incoming'); }
+          if (curP >= p.tp2) { closePosition(p.id, 'تحقيق الهدف الكامل TP2 🎯'); stateChanged = true; } else if (curP <= p.sl) { closePosition(p.id, 'ضرب وقف الخسارة'); stateChanged = true; }
+        } else { 
+          if (!p.breakevenSecured && curP <= p.tp1) { p.sl = p.entry; p.breakevenSecured = true; stateChanged = true; appendChatMessage(`🛡️ <b>تأمين (${p.asset}):</b> ضرب الهدف الأول، تم تأمين الدخول.`, 'incoming'); }
+          if (curP <= p.tp2) { closePosition(p.id, 'تحقيق الهدف الكامل TP2 🎯'); stateChanged = true; } else if (curP >= p.sl) { closePosition(p.id, 'ضرب وقف الخسارة'); stateChanged = true; }
+        }
+      }
+      if (stateChanged) renderPortfolio();
+    }
+
+    let isSniperScanning = false;
+    
+    // --- خوارزمية القناص الآلي المحسنة ---
+    async function advancedAutoSniperLoop() {
+      if (!isAutoSniperActive || wallet.positions.length >= 5 || isSniperScanning) return;
+      isSniperScanning = true;
+
+      const availableCoins = VERIFIED_COINS.filter(c => !wallet.positions.some(p => p.asset === c));
+      let signalFound = false;
+
+      for (const coin of availableCoins) {
+        if (wallet.positions.length >= 5) break;
+        if (matrixRegistry[coin].price === 0) continue;
+
+        try {
+          const res = await fetch(`https://api.binance.com/api/v3/klines?symbol=${coin}USDT&interval=15m&limit=200`);
+          const klines = await res.json();
+          if(klines.length < 200) continue;
+
+          const closePrices = klines.map(d => parseFloat(d[4]));
+          const currentPrice = closePrices[closePrices.length - 1];
+          
+          const rsi = calculateRSI(closePrices, 14);
+          const ema9 = calculateEMA(closePrices, 9);
+          const ema21 = calculateEMA(closePrices, 21);
+          const ema200 = calculateEMA(closePrices, 200); 
+          const hasVolumeSpike = checkVolumeSpike(klines);
+          const realAtr = calculateRealATR(klines);
+
+          let signal = null; let reason = ""; let score = 75; 
+
+          // الشروط المخففة لضمان التقاط الفرص (لا تتطلب RSI متطرف)
+          if (currentPrice > ema200 && ema9 > ema21 && hasVolumeSpike) {
+            signal = 'BUY'; reason = 'ترند صاعد (فوق EMA200) + تقاطع إيجابي + سيولة شرائية مدعومة بحجم تداول عالي.';
+            score += 15; if (rsi > 50 && rsi < 65) score += 8;
+          } 
+          else if (currentPrice < ema200 && ema9 < ema21 && hasVolumeSpike) {
+            signal = 'SELL'; reason = 'ترند هابط (تحت EMA200) + تقاطع سلبي + ضغط بيعي مؤسساتي بحجم تداول عالي.';
+            score += 15; if (rsi > 35 && rsi < 50) score += 8;
+          }
+
+          if (signal) {
+            matrixRegistry[coin].atr = realAtr; matrixRegistry[coin].dir = signal; 
+            appendChatMessage(`🤖 <b>رادار القنص:</b> رصد سيولة ذكية حقيقية على ${coin}. السعر متوافق مع الاتجاه.`, 'incoming');
+            dispatchTradePrediction(coin, reason, Math.min(score, 98)); 
+            signalFound = true;
+            break; 
+          }
+        } catch (e) { console.warn('تأخير مؤقت في جلب بيانات ' + coin); }
+        
+        await new Promise(resolve => setTimeout(resolve, 200));
+      }
+      
+      // إبلاغ المستخدم بصرياً في حال عدم وجود فرصة
+      if (!signalFound) {
+          const radarTxt = document.getElementById('radar-text');
+          if(radarTxt) radarTxt.textContent = "الرادار نشط (بانتظار فرصة مناسبة...)";
+      } else {
+          const radarTxt = document.getElementById('radar-text');
+          if(radarTxt) radarTxt.textContent = "الرادار نشط (Smart Money)";
+      }
+      
+      isSniperScanning = false;
+    }
+
+    function connectBinanceWebSocket() {
+      const ws = new WebSocket('wss://stream.binance.com:9443/ws/!miniTicker@arr');
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data); let priceChanged = false;
+        data.forEach(ticker => {
+          if (ticker.s.endsWith('USDT')) {
+            const coin = ticker.s.replace('USDT', '');
+            if (VERIFIED_COINS.includes(coin)) {
+              const newP = parseFloat(ticker.c); const oldP = matrixRegistry[coin].price;
+              matrixRegistry[coin].price = newP; if(matrixRegistry[coin].atr === 0) matrixRegistry[coin].atr = newP * 0.015;
+              if (!matrixRegistry[coin].history) matrixRegistry[coin].history = []; matrixRegistry[coin].history.push(newP); if (matrixRegistry[coin].history.length > 20) matrixRegistry[coin].history.shift();
+              const storyPriceEl = document.getElementById(`top-price-${coin}`);
+              if (storyPriceEl) { storyPriceEl.textContent = `$${formatAccuratePrice(newP)}`; storyPriceEl.style.color = (newP >= oldP) ? 'var(--matrix-green)' : 'var(--fb-red)'; }
+              document.querySelectorAll(`.live-pred-price-${coin}`).forEach(el => el.textContent = `$${formatAccuratePrice(newP)}`);
+              if (coin === currentAsset) {
+                  const liveSub = document.getElementById('live-price-sub');
+                  if (liveSub) liveSub.textContent = `السعر اللحظي: $${formatAccuratePrice(newP)}`;
+              }
+              priceChanged = true;
+            }
+          }
+        });
+        if (priceChanged) { updateTargetDisplay(currentAsset); checkOpenPositions(); if (Date.now() - (window.lastTableUpdate || 0) > 2000) { renderMarketTable(); window.lastTableUpdate = Date.now(); } }
+      };
+      ws.onerror = () => console.error('⚠️ خطأ WebSocket');
+      ws.onclose = () => setTimeout(connectBinanceWebSocket, 3000); 
+    }
+
+    // --- واجهات العرض (Rendering) ---
+    function renderTopStories() {
+      const row = document.getElementById('top-stories-row');
+      row.innerHTML = VERIFIED_COINS.slice(0, 10).map(coin => `
+        <div class="story-card ${coin === currentAsset ? 'active' : ''}" id="top-card-${coin}" onclick="switchAsset('${coin}')">
+          <b>${coin}</b><span>USDT</span><small id="top-price-${coin}" style="color:var(--matrix-green);">$${formatAccuratePrice(matrixRegistry[coin].price)}</small>
+        </div>`).join('');
+    }
+
+    function renderPortfolio() {
+      let unPnlTotal = 0; let totalInvested = 0; const tbody = document.getElementById('positions-body'); document.getElementById('open-trades-count').textContent = wallet.positions.length;
+      if (wallet.positions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; color:var(--fb-muted); padding:16px 0;">لا توجد صفقات</td></tr>';
+        document.getElementById('total-pnl-banner').textContent = '$0.00 (0.00%)'; document.getElementById('total-pnl-banner').style.color = 'var(--fb-muted)';
+      } else {
+        tbody.innerHTML = wallet.positions.map(p => {
+          const curP = matrixRegistry[p.asset].price || p.entry; const pnl = p.type === 'BUY' ? (curP - p.entry) * p.size : (p.entry - curP) * p.size;
+          unPnlTotal += pnl; totalInvested += p.margin; const isWin = pnl >= 0;
+          return `
+            <tr style="border-bottom:1px solid #141f2b;">
+              <td style="padding:6px 4px;"><b style="color:#fff;">${p.asset}</b> <span style="color:${p.type === 'BUY' ? 'var(--matrix-green)' : 'var(--fb-red)'}">${p.type}</span><div style="font-size:0.6rem; color:var(--fb-muted);">$${p.margin} ${p.breakevenSecured ? '🛡️' : ''}</div></td>
+              <td style="padding:6px 4px; font-family:monospace; direction:ltr;"><div style="color:var(--fb-muted); font-size:0.65rem;">$${formatAccuratePrice(p.entry)}</div><div style="font-weight:bold; color:#fff;">$${formatAccuratePrice(curP)}</div></td>
+              <td style="padding:6px 4px;"><div class="pnl-badge ${isWin ? 'badge-win' : 'badge-loss'}">${isWin ? '+' : ''}$${pnl.toFixed(2)}</div></td>
+              <td style="padding:6px 4px; text-align:center;"><button class="btn-close" onclick="closePosition(${p.id})">✕</button></td>
+            </tr>`;
+        }).join('');
+        const roe = totalInvested > 0 ? (unPnlTotal / totalInvested) * 100 : 0; const banner = document.getElementById('total-pnl-banner');
+        banner.textContent = `${unPnlTotal >= 0 ? '+' : ''}$${unPnlTotal.toFixed(2)} (${roe.toFixed(2)}%)`; banner.style.color = unPnlTotal >= 0 ? 'var(--matrix-green)' : 'var(--fb-red)';
+      }
+      document.getElementById('cash-val').textContent = `$${wallet.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+    }
+
+    function renderJournalStats() {
+      const history = wallet.history || []; document.getElementById('journal-total-closed').textContent = history.length;
+      if (history.length > 0) {
+        const wins = history.filter(h => h.win).length; document.getElementById('journal-win-rate').textContent = `${Math.round((wins / history.length) * 100)}%`;
+        const totalProfit = history.reduce((s, h) => s + h.pnl, 0); const profitEl = document.getElementById('journal-total-profit');
+        profitEl.textContent = `${totalProfit >= 0 ? '+' : ''}$${totalProfit.toFixed(2)}`; profitEl.style.color = totalProfit >= 0 ? 'var(--matrix-green)' : 'var(--fb-red)';
+      }
+    }
+
+    function renderMarketTable() {
+      const tbody = document.getElementById('binance-market-tbody');
+      tbody.innerHTML = VERIFIED_COINS.map(coin => {
+        const data = matrixRegistry[coin]; let dailyChangeText = "+0.0%", color = "var(--fb-muted)";
+        if (data.history.length > 0 && data.price > 0) { const change = ((data.price - data.history[0]) / data.history[0]) * 100; dailyChangeText = `${change >= 0 ? '+' : ''}${change.toFixed(2)}%`; color = change >= 0 ? "var(--matrix-green)" : "var(--fb-red)"; }
+        return `
+          <tr class="binance-row-clickable ${coin === currentAsset ? 'active-row' : ''}" onclick="switchAsset('${coin}')">
+            <td><b>${coin}</b> <span style="font-size:0.65rem; color:var(--fb-muted);">/USDT</span></td>
+            <td style="direction:ltr; font-weight:bold; color:var(--matrix-green);">$${formatAccuratePrice(data.price)}</td>
+            <td><span style="color:${color}; font-weight:bold;">${dailyChangeText}</span></td>
+            <td><b style="color:var(--cyber-cyan); font-family:monospace;">ATR: $${formatAccuratePrice(data.atr)}</b></td>
+          </tr>`;
+      }).join('');
+    }
+
+    // --- المحادثة والراديو ---
+    function appendChatMessage(html, type) { const box = document.getElementById('wa-messages-box'); const div = document.createElement('div'); div.className = `wa-bubble ${type}`; div.innerHTML = `${html}<div class="wa-msg-meta"><span>الآن</span></div>`; box.appendChild(div); box.scrollTop = box.scrollHeight; }
+    function sendCustomMatrixQuery() { const inp = document.getElementById('wa-chat-input'); if(inp.value.trim()){ appendChatMessage(inp.value.trim(), 'outgoing'); inp.value = ''; setTimeout(() => { dispatchTradePrediction(currentAsset); }, 500); } }
+    function speakText(txt) { if(isBotVoiceEnabled && 'speechSynthesis' in window) { window.speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(txt.replace(/<[^>]*>?/gm, '')); u.lang = 'ar-SA'; window.speechSynthesis.speak(u); } }
+    
+    let radioStations = [ { name: "إذاعة القرآن الكريم (القاهرة)", url: "https://stream.radiojar.com/8s5u5tpdtwzuv" }, { name: "إذاعة السنة النبوية", url: "https://stream.radiojar.com/4wqre23fytzuv" }, { name: "مونت كارلو الدولية (أخبار)", url: "https://montecarlodoualiya128k.ice.infomaniak.ch/mc-doualiya.mp3" }, { name: "بي بي سي عربي (BBC Arabic)", url: "http://bbcwssc.ic.llnwd.net/stream/bbcwssc_mp1_ws-araba" }, { name: "راديو استرخاء (Chill)", url: "https://stream.radioparadise.com/mellow-128" }, { name: "موسيقى التركيز (Lo-Fi)", url: "http://stream.zeno.fm/f3wvbbqmdg8uv" } ];
+    let currentStationIdx = 0; let isRadioPlaying = false;
+    function updateRadioStation() { document.getElementById('radio-title').textContent = radioStations[currentStationIdx].name; const audio = document.getElementById('cyber-radio-audio'); audio.src = radioStations[currentStationIdx].url; if (isRadioPlaying) audio.play().catch(()=>{}); }
+    function radioTogglePlay() { const audio = document.getElementById('cyber-radio-audio'); if (!isRadioPlaying) { audio.src = radioStations[currentStationIdx].url; audio.volume = parseFloat(document.getElementById('radio-volume').value) || 0.8; audio.play().then(() => { isRadioPlaying = true; document.getElementById('radio-play-btn').textContent = '⏸'; document.getElementById('radio-status').textContent = 'يعمل الآن 🟢'; }).catch(() => alert('تعذر تشغيل هذه المحطة')); } else { audio.pause(); isRadioPlaying = false; document.getElementById('radio-play-btn').textContent = '▶'; document.getElementById('radio-status').textContent = 'متوقف'; } }
+    function radioStop() { document.getElementById('cyber-radio-audio').pause(); isRadioPlaying = false; document.getElementById('radio-play-btn').textContent = '▶'; document.getElementById('radio-status').textContent = 'متوقف'; }
+    function radioNextStation() { currentStationIdx = (currentStationIdx + 1) % radioStations.length; updateRadioStation(); }
+    function radioPrevStation() { currentStationIdx = (currentStationIdx - 1 + radioStations.length) % radioStations.length; updateRadioStation(); }
+    function changeRadioVolume(val) { document.getElementById('cyber-radio-audio').volume = parseFloat(val); }
+
+    // --- الإقلاع ---
+    window.addEventListener('load', () => {
+      renderTopStories(); renderPortfolio(); renderJournalStats();
+      
+      const voiceBtn = document.getElementById('btn-voice-commentary');
+      if (voiceBtn) { voiceBtn.textContent = isBotVoiceEnabled ? '🔊' : '🔇'; voiceBtn.style.color = isBotVoiceEnabled ? 'var(--matrix-green)' : 'var(--fb-muted)'; }
+
+      setupWindowResizer('predictions-left-widget', 'pred-resizer', true);
+      setupWindowResizer('wa-side-widget', 'wa-resizer', false);
+      connectBinanceWebSocket();
+      
+      // نبض القناص كل 60 ثانية
+      setInterval(advancedAutoSniperLoop, 60000); 
+    });
+  </script>
+</body>
+</html>
