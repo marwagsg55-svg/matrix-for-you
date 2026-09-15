@@ -6,7 +6,7 @@
     <title>مجموعة بيكسل | Pixel Group</title>
     <!-- مكتبة HLS -->
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <!-- خطوط مستقبلية من جوجل -->
+    <!-- خطوط مستقبلية -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&family=Orbitron:wght@500;700&display=swap" rel="stylesheet">
     
     <style>
@@ -70,7 +70,7 @@
         .brand {
             text-align: center;
             margin-bottom: 15px;
-            padding-bottom: 10px;
+            padding-bottom: 15px;
             border-bottom: 1px solid rgba(0, 243, 255, 0.3);
         }
 
@@ -83,13 +83,22 @@
             letter-spacing: 2px;
         }
 
-        .brand span {
-            font-size: 0.75rem;
-            color: #888;
-            letter-spacing: 1px;
+        .brand .subtitle {
+            display: block;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #a0c4c7;
+            line-height: 1.5;
+            text-shadow: 0 0 5px rgba(0, 243, 255, 0.3);
+        }
+        
+        .brand .subtitle span {
+            color: var(--neon-cyan);
+            font-weight: bold;
         }
 
-        .search-box {
+        /* تنسيق حقول الإدخال والاختيار */
+        .cyber-input {
             width: 100%;
             background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--neon-cyan);
@@ -104,11 +113,15 @@
             transition: all 0.3s;
         }
 
-        .search-box:focus {
+        .cyber-input:focus {
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
         }
 
-        /* زر حذف القنوات التالفة */
+        .cyber-input option {
+            background-color: #050510;
+            color: var(--neon-cyan);
+        }
+
         .clean-btn {
             background: rgba(255, 0, 60, 0.15);
             border: 1px solid var(--neon-red);
@@ -215,7 +228,6 @@
             100% { box-shadow: 0 0 4px var(--neon-green); }
         }
 
-        /* مساحة العرض والتحكم بالدقة */
         .player-container {
             flex-grow: 1;
             display: flex;
@@ -289,14 +301,24 @@
     <div class="cyber-grid"></div>
 
     <div class="sidebar">
+        <!-- قسم العنوان الجديد -->
         <div class="brand">
             <h1>مجموعة بيكسل</h1>
-            <span>PIXEL GROUP SYSTEM V2.1</span>
+            <div class="subtitle">
+                بإدارة: <span>مصطفى رشيد</span><br>
+                فرع أول: أطمة | فرع ثاني: الدانا
+            </div>
         </div>
 
-        <input type="text" id="search-box" class="search-box" placeholder="ابحث في قاعدة البيانات..." oninput="filterChannels()">
+        <!-- قائمة اختيار السيرفر / القائمة -->
+        <select id="playlist-selector" class="cyber-input" onchange="loadSelectedPlaylist()">
+            <option value="https://iptv-org.github.io/iptv/index.category.m3u">القائمة العالمية (حسب التصنيف)</option>
+            <option value="https://iptv-org.github.io/iptv/index.m3u">القائمة الشاملة (جميع القنوات)</option>
+            <option value="https://iptv-org.github.io/iptv/languages/ara.m3u" selected>القنوات العربية</option>
+        </select>
+
+        <input type="text" id="search-box" class="cyber-input" placeholder="ابحث في قاعدة البيانات..." oninput="filterChannels()">
         
-        <!-- زر مسح القنوات التي لا تعمل -->
         <button class="clean-btn" onclick="removeOfflineChannels()">[x] مسح القنوات غير العاملة</button>
 
         <div class="groups-container" id="groups-list">
@@ -307,7 +329,6 @@
     </div>
 
     <div class="player-container">
-        <!-- شريط التحكم الإضافي (الدقة) -->
         <div class="controls-bar">
             <span style="font-size: 0.9rem; color: var(--neon-cyan);">إعدادات البث</span>
             <div>
@@ -325,23 +346,35 @@
     </div>
 
     <script>
-        const M3U_URL = "https://iptv-org.github.io/iptv/index.category.m3u";
         let allChannelsData = {};
         let hls;
 
+        // تحميل القائمة المختارة عند فتح الصفحة
         window.onload = () => {
-            fetch(M3U_URL)
+            loadSelectedPlaylist();
+        };
+
+        // دالة جلب القائمة بناءً على اختيار المستخدم
+        function loadSelectedPlaylist() {
+            const url = document.getElementById('playlist-selector').value;
+            const groupsList = document.getElementById('groups-list');
+            
+            groupsList.innerHTML = '<div style="color: var(--neon-cyan); text-align: center; margin-top: 50px;"><p>جاري استيراد البيانات... قد يستغرق هذا بضع ثوانٍ للقوائم الكبيرة.</p></div>';
+            document.getElementById('now-playing-text').innerText = "جاري تحديث القنوات...";
+
+            fetch(url)
                 .then(res => res.text())
                 .then(data => {
                     const groups = parseM3U(data);
                     renderGroups(groups);
-                    document.getElementById('now-playing-text').innerText = "تم استيراد القنوات بنجاح. اختر قناة.";
+                    document.getElementById('now-playing-text').innerText = "تم تحديث القنوات بنجاح. اختر قناة.";
                 })
                 .catch(err => {
                     console.error(err);
+                    groupsList.innerHTML = '<div style="color: var(--neon-red); text-align: center; margin-top: 50px;"><p>فشل الاتصال بالخادم.</p></div>';
                     document.getElementById('now-playing-text').innerText = "حدث خطأ أثناء جلب القنوات.";
                 });
-        };
+        }
 
         function parseM3U(content) {
             const lines = content.split('\n');
@@ -424,7 +457,6 @@
             }
         }
 
-        // ميزة مسح القنوات التي لا تعمل
         function removeOfflineChannels() {
             const detailsList = document.querySelectorAll('#groups-list details');
             let removedCount = 0;
@@ -435,7 +467,6 @@
 
                 buttons.forEach(btn => {
                     const indicator = btn.querySelector('.status-indicator');
-                    // إذا كانت القناة غير عاملة (حمراء) أو لم يتم فحصها بعد (يمكنك اختيار حذف التالفة فقط)
                     if (indicator.classList.contains('status-offline')) {
                         btn.remove();
                         removedCount++;
@@ -444,7 +475,6 @@
                     }
                 });
 
-                // تحديث العداد أو إخفاء المجلد إذا فرغ تماماً
                 const badge = details.querySelector('.count-badge');
                 if (badge) badge.innerText = `[${activeCount}]`;
 
@@ -500,7 +530,6 @@
                 hls.loadSource(streamUrl);
                 hls.attachMedia(video);
                 
-                // ملء خيارات الجودة عند توفر البيانات
                 hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
                     qualitySelect.innerHTML = '<option value="-1">تلقائي (Auto)</option>';
                     data.levels.forEach((level, index) => {
@@ -523,7 +552,6 @@
             }
         }
 
-        // تغيير دقة الفيديو عبر القائمة المنسدلة
         function changeQuality(levelIndex) {
             if (hls) {
                 hls.currentLevel = parseInt(levelIndex);
